@@ -65,18 +65,25 @@ getCourseById: async (req, res) =>{
 updateCourse: async (req, res) =>{
     try {
         const updatedCourseInfo = req.body; 
-        const id = req.params.id
+        const id = req.params.id;
+        const userId = req.currentUser.id;
+        console.log({id});
         const course = await Course.findByPk(id);
         console.log(`Course id ${id}`, !course);
         if(!course){ // check that course exists
             return res.status(404).json({error: 'Course not found'
         });
-        } else if((!updatedCourseInfo.title || !updatedCourseInfo.title === "")||
+        } else if(id != userId){
+            // current user not authorized to update course
+            return res.status(403).json({error: "Not Authorised"});
+        }else if((!updatedCourseInfo.title || !updatedCourseInfo.title === "")||
         (!updatedCourseInfo.description || !updatedCourseInfo.description === "")  ) {
             //if title or description is not present
            return res.status(400).json({ error: "Title and description is required"})
         } else {  
-        //update if all is ok     
+        //update if all is ok 
+        const user = req.currentUser;
+        console.log("authenticateduser", user);    
         const updatedCourse = await course.update(updatedCourseInfo);
         return res.status(204).end();
         }
@@ -88,10 +95,16 @@ updateCourse: async (req, res) =>{
 deleteCourse: async (req, res) =>{
     try {
         const id = req.params.id;
+        const userId = req.currentUser;
         const course = await Course.findByPk(id);
         if(!course){
+            //course not found
             return res.status(404).json({error: 'Course not found'});
-        } else {
+        } if(id != userId){
+            //current user not the authorised to delete course
+            return res.status(403).json({error: "Not Authorised"})
+        }else {
+         // all is ok delet the course   
         const deleteCourse =   await Course.destroy({
                             where:{id: id  }
                         });
