@@ -7,6 +7,7 @@ const bcrypt = require('bcryptjs');
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {}
   User.init({
+    // first name is required and cannot be empty
     firstName: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -19,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
     },
       }
     },
+    // last name is required and cannot be empty    
     lastName: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -31,6 +33,7 @@ module.exports = (sequelize, DataTypes) => {
     },
       }
     },
+ // email is required, cannot be empty, unique and email type
     emailAddress: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -46,6 +49,8 @@ module.exports = (sequelize, DataTypes) => {
         }
       }
     },
+
+// password is required, cannot be empty and is stored hashed    
     password: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -70,6 +75,7 @@ module.exports = (sequelize, DataTypes) => {
     modelName: 'User',
   });
 
+// user is linked to courses, 1 user can have multiple courses  
   User.associate = (model) => {
     User.hasMany(model.Course, {
       foreignKey: {

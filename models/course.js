@@ -5,6 +5,7 @@ const {
 module.exports = (sequelize, DataTypes) => {
   class Course extends Model {}
   Course.init({
+    // title is required and cannot be empty
     title: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -17,6 +18,7 @@ module.exports = (sequelize, DataTypes) => {
         }
     }
     },
+        // description is required and cannot be empty
     description: {
       type: DataTypes.TEXT,
       allowNull: false,
@@ -29,13 +31,15 @@ module.exports = (sequelize, DataTypes) => {
         }
       }
     },
-      estimatedTime: DataTypes.STRING,
+    // option fields
+    estimatedTime: DataTypes.STRING,
     materialsNeeded: DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'Course',
   });
 
+  // coure belongs to one user (presenter)
   Course.associate = (model) => {
     Course.belongsTo(model.User, {
       foreignKey: {

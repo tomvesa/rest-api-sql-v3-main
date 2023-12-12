@@ -1,8 +1,11 @@
 const express = require('express');
+const router = express.Router();
+
+//import individual routers
 const userRouter = require('./user');
 const courseRouter = require('./course');
 
-const router = express.Router();
+
 
 //combine routes together into a single router
 router.use('/users', userRouter);
