@@ -12,8 +12,9 @@ const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'tr
 
 
 // router imports
-const user = require('./routes/api/user');
-const course = require('./routes/api/course');
+// const user = require('./routes/api/user');
+// const course = require('./routes/api/course');
+const routes = require('./routes/api');
 
 // create the Express app
 const app = express();
@@ -35,8 +36,9 @@ app.use( asyncHandler( async ( req, res, next) => {
 )
   
 
-app.use('/api/users', user);
-app.use('/api/courses', course);
+// app.use('/api/users', user);
+// app.use('/api/courses', course);
+app.use('/api/', routes);
 
 // setup a friendly greeting for the root route
 app.get('/', (req, res) => {
