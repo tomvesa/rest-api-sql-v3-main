@@ -78,6 +78,7 @@ module.exports = (sequelize, DataTypes) => {
 // user is linked to courses, 1 user can have multiple courses  
   User.associate = (model) => {
     User.hasMany(model.Course, {
+      as: 'Instructor', // alias
       foreignKey: {
         fieldName: 'userId',
         allowNull: true,
