@@ -14,11 +14,8 @@ module.exports = {
             emailAddress,
             password
         });
-
-        return res.status(201).json({
-            message: 'User created successfully',
-            user,
-        })
+               res.set('Location', '/') 
+        return res.status(201).send();
     } catch (err){
         console.log(err.errors)
         if(err.name == 'SequelizeValidationError' || err.name == 'SequelizeUniqueConstraintError'){
@@ -41,6 +38,21 @@ getAllUsers: async (req, res) =>{
 } catch (err) {
     res.status(400).json({err})}
 },
+
+//get all users and print them out in descending order by id
+getCurrentUser: async (req, res) =>{
+    try {
+        const currentUserId = req.currentUser.id;
+        const user = await User.findOne({
+                    where: {id: currentUserId},
+                    attributes: ['id', 'firstName', 'lastName', 'emailAddress' ],
+                    order: [['id', 'DESC']]
+                    });
+        return res.status(200).json({ user });
+} catch (err) {
+    res.status(400).json({err})}
+},
+
 
 // delete user
 deleteUser: async (req, res) =>{
