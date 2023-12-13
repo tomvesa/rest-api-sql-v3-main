@@ -25,13 +25,10 @@ app.use(morgan('dev'));
 //connection to database
 const sequelize = new Sequelize(development);
 // test if connection is established
-app.use( asyncHandler( async ( req, res, next) => {
-  await sequelize.authenticate();
-  await sequelize.sync({force: true});
-  console.log('Connected to database');
-  next();
-    })
-)
+  sequelize.authenticate()
+          .then(() =>  console.log('connection established') )
+          .catch(err =>  console.log(`Error connecting to database:`, err.message));
+
   
 
 // use api routes
