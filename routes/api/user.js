@@ -3,12 +3,12 @@ const userRouter = express.Router();
 const { authenticateUser } = require('../../middleware/auth-user');
 
 // import controllers to handle individual route requests/http methods
-const { register, getAllUsers, deleteUser } = require('../../controllers/user');
+const { register, getCurrentUser, deleteUser } = require('../../controllers/user');
 
 
 
 userRouter.post('/', register);
-userRouter.get('/', authenticateUser, getAllUsers);
+userRouter.get('/', authenticateUser, getCurrentUser);
 userRouter.delete('/:id', authenticateUser, deleteUser);
 
 
