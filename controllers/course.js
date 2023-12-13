@@ -1,4 +1,4 @@
-const {Course} = require('../models/');
+const {Course, User} = require('../models/');
 
 // methods for controling the interaction between the database and course model
 module.exports = {
@@ -15,11 +15,8 @@ module.exports = {
             materialsNeeded,
             userId,
         });
-
-        return res.status(201).json({
-            message: 'Course created successfully',
-            course,
-        })
+               res.set('Location', `/courses/${course.id}`) 
+        return res.status(201).json()
     } catch (err){
         if(err.name == 'SequelizeValidationError' || err.name == 'SequelizeUniqueConstraintError'){
             const errors = err.errors.map(err => err.message);
@@ -37,7 +34,12 @@ getAllCourses: async (req, res) =>{
     try {
         const courses = await Course.findAll({
                     attributes: ['id', 'title', 'description', 'materialsNeeded', 'estimatedTime',  'userId', ],
-                    order: [['id', 'DESC']]
+                    order: [['id', 'DESC']],
+                    include: {
+                        model: User,   
+                        attributes: ['firstName', 'lastName', ],
+                        as: 'Instructor'                                        
+                    }
                     });
         return res.status(200).json({ courses });
 } catch (err) {
@@ -49,7 +51,12 @@ getCourseById: async (req, res) =>{
     try {
         const id = req.params.id
         const course = await Course.findByPk(id, {
-            attributes:  ['title', 'description', 'materialsNeeded', 'estimatedTime','userId'],        
+            attributes:  ['title', 'description', 'materialsNeeded', 'estimatedTime','userId'], 
+            include: {
+                model: User,
+                as: 'Instructor',
+                attributes: ['firstName', 'lastName'],
+            }       
         });
 
         if(!course){
@@ -67,13 +74,12 @@ updateCourse: async (req, res) =>{
         const updatedCourseInfo = req.body; 
         const id = req.params.id;
         const userId = req.currentUser.id;
-        console.log({id});
         const course = await Course.findByPk(id);
-        console.log(`Course id ${id}`, !course);
+        console.log(`Course id ${course.userId != userId}`);
         if(!course){ // check that course exists
             return res.status(404).json({error: 'Course not found'
         });
-        } else if(id != userId){
+        } else if(course.userId != userId){
             // current user not authorized to update course
             return res.status(403).json({error: "Not Authorised"});
         }else if((!updatedCourseInfo.title || !updatedCourseInfo.title === "")||
@@ -95,12 +101,12 @@ updateCourse: async (req, res) =>{
 deleteCourse: async (req, res) =>{
     try {
         const id = req.params.id;
-        const userId = req.currentUser;
+        const userId = req.currentUser.id;
         const course = await Course.findByPk(id);
         if(!course){
             //course not found
             return res.status(404).json({error: 'Course not found'});
-        } if(id != userId){
+        } if(course.userId != userId){
             //current user not the authorised to delete course
             return res.status(403).json({error: "Not Authorised"})
         }else {
